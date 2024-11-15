@@ -1,0 +1,40 @@
+version: '3'
+services:
+  # MongoDB Service
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-password}
+
+  # Server Backend Service
+  server:
+    build: ./server
+    container_name: song-market-server
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      MONGO_URI: ${MONGO_URI:-mongodb://admin:password@mongodb:27017/song-market}
+    depends_on:
+      - mongodb
+
+  # Client Frontend Service
+  client:
+    build: ./client
+    container_name: song-market-client
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+
+volumes:
+  mongo-data:

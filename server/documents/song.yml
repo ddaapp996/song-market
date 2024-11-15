@@ -1,0 +1,163 @@
+openapi: 3.0.0
+info:
+  title: Song API
+  description: API endpoints for managing songs
+  version: 1.0.0
+tags:
+  - name: Song
+    description: API for song management
+paths:
+  /api/songs:
+    get:
+      summary: Get a list of all songs
+      tags:
+        - Song
+      responses:
+        200:
+          description: A list of songs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 60f5b5f5c5b3c3a6b4f5d5c5
+                    title:
+                      type: string
+                      example: "Song Title"
+                    artist:
+                      type: string
+                      example: "Artist Name"
+                    album:
+                      type: string
+                      example: "Album Name"
+                    genre:
+                      type: string
+                      example: "Pop"
+                    url:
+                      type: string
+                      example: "https://example.com/song.mp3"
+                    coverImage:
+                      type: string
+                      example: "https://example.com/cover.jpg"
+                    downloads:
+                      type: integer
+                      example: 123
+
+    post:
+      summary: Create a new song
+      tags:
+        - Song
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "New Song Title"
+                artist:
+                  type: string
+                  example: "Artist Name"
+                album:
+                  type: string
+                  example: "Album Name"
+                genre:
+                  type: string
+                  example: "Pop"
+                url:
+                  type: string
+                  example: "https://example.com/song.mp3"
+                coverImage:
+                  type: string
+                  example: "https://example.com/cover.jpg"
+      responses:
+        201:
+          description: Song created successfully
+        400:
+          description: Bad request
+
+  /api/songs/{id}:
+    get:
+      summary: Get song details by ID
+      tags:
+        - Song
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the song
+          schema:
+            type: string
+            example: 60f5b5f5c5b3c3a6b4f5d5c5
+      responses:
+        200:
+          description: Song details
+        404:
+          description: Song not found
+
+    put:
+      summary: Update a song by ID
+      tags:
+        - Song
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the song to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Updated Song Title"
+                artist:
+                  type: string
+                  example: "Updated Artist Name"
+                album:
+                  type: string
+                  example: "Updated Album Name"
+                genre:
+                  type: string
+                  example: "Rock"
+                url:
+                  type: string
+                  example: "https://example.com/new-song.mp3"
+                coverImage:
+                  type: string
+                  example: "https://example.com/new-cover.jpg"
+      responses:
+        200:
+          description: Song updated successfully
+        404:
+          description: Song not found
+        400:
+          description: Bad request
+
+    delete:
+      summary: Delete a song by ID
+      tags:
+        - Song
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the song to delete
+          schema:
+            type: string
+      responses:
+        200:
+          description: Song deleted successfully
+        404:
+          description: Song not found
