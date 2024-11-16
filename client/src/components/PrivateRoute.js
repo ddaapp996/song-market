@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { verifyToken } from '../api';
 import { Spin } from 'antd';
+import { jwtDecode } from "jwt-decode";
 
-const PrivateRoute = ({ children }) => {
+const PrivateRoute = ({ setRole, children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
@@ -14,12 +15,14 @@ const PrivateRoute = ({ children }) => {
       if (token) {
         const isValid = await verifyToken(token);
         setIsAuthenticated(isValid);
+        const decode = jwtDecode(token);
+        setRole && setRole(decode?.user?.role || 'user');
       }
       setLoading(false);
     };
 
     checkAuth();
-  }, []);
+  }, [setRole]);
 
   if (loading) {
     return (

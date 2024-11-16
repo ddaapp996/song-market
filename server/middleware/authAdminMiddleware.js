@@ -21,13 +21,13 @@ const authAdminMiddleware = async (req, res, next) => {
     const user = await User.findOne({
       $or: [{ email: email }, { username: username }],
     });
-    if (!user) return res.status(404).json({ error: "Invalid token" });
+    if (!user) return res.status(404).json({ error: "User is not founded" });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ error: "Invalid token" });
+    const isMatch = password === user.password;
+    if (!isMatch) return res.status(400).json({ error: "Password is not correct" });
 
     if (user.role !== "admin") {
-      return res.status(400).json({ error: "Invalid token" });
+      return res.status(400).json({ error: "User is not admin" });
     }
     req.user = user;
     next();

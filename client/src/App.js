@@ -1,11 +1,14 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import PrivateRoute from './components/PrivateRoute';
-import Register from './pages/Register';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import PrivateRoute from "./components/PrivateRoute";
+import Register from "./pages/Register";
+import { AdminManage } from "./pages/AdminManage";
 
 const App = () => {
+  const [role, setRole] = useState("user");
+
   return (
     <Router>
       <Routes>
@@ -14,9 +17,7 @@ const App = () => {
         <Route
           path="/"
           element={
-            <PrivateRoute>
-              <Home />
-            </PrivateRoute>
+            <PrivateRoute setRole={setRole}>{role === "user" ? <Home /> : <AdminManage />}</PrivateRoute>
           }
         />
       </Routes>

@@ -6,6 +6,8 @@ const Song = require("./models/Song");
 const Banner = require("./models/Banner");
 const connectDB = require("./config/database");
 const fakeSongsData = require("./data/songs");
+const fakeProducts = require("./data/products");
+const Product = require("./models/Product");
 
 dotenv.config();
 
@@ -27,6 +29,7 @@ const users = [
 ];
 
 const songs = fakeSongsData(2000);
+const products = fakeProducts(250);
 
 const banners = [
   {
@@ -54,6 +57,7 @@ const seedData = async () => {
     await User.deleteMany({});
     await Song.deleteMany({});
     await Banner.deleteMany({});
+    await Product.deleteMany({});
 
     for (let user of users) {
       const salt = await bcrypt.genSalt(10);
@@ -63,6 +67,7 @@ const seedData = async () => {
     await User.insertMany(users);
     await Song.insertMany(songs);
     await Banner.insertMany(banners);
+    await Product.insertMany(products);
 
     console.log("Data seeded successfully");
     mongoose.connection.close();

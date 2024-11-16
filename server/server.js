@@ -1,31 +1,36 @@
 const express = require("express");
-const cors = require('cors');
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const connectDB = require("./config/database");
-const { swaggerUi, swaggerDocs } = require('./config/swagger');
+const { swaggerUi, swaggerDocs } = require("./config/swagger");
 require("dotenv").config();
-const path = require('path');
+const path = require("path");
 
 const app = express();
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  })
+);
 connectDB();
 
-app.use('/images', express.static(path.join(__dirname, 'public/images')));
-app.use('/musics', express.static(path.join(__dirname, 'public/musics')));
+app.use("/images", express.static(path.join(__dirname, "public/images")));
+app.use("/musics", express.static(path.join(__dirname, "public/musics")));
+app.use("/products", express.static(path.join(__dirname, "public/products")));
 app.use(bodyParser.json());
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 const authRoutes = require("./routes/auth");
 const songRoutes = require("./routes/songs");
 const bannerRoutes = require("./routes/banners");
+const productRoutes = require("./routes/products");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/songs", songRoutes);
 app.use("/api/banners", bannerRoutes);
+app.use("/api/products", productRoutes);
 
 app.get("/", (req, res) => {
   res.send("Welcome to Song Market API");
