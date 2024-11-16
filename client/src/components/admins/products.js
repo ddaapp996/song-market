@@ -16,6 +16,7 @@ import {
   InputNumber,
   Upload,
   message,
+  Popconfirm,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import axiosClient from "../../config/axiosConfig";
@@ -51,7 +52,8 @@ function convertToSlug(input) {
   );
 }
 
-export const Products = ({ seq, setSeq }) => {
+export const Products = () => {
+  const [count, setCount] = useState(0);
   const [searchText, setSearchText] = React.useState("");
   const [data, setData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,6 +61,7 @@ export const Products = ({ seq, setSeq }) => {
   const [imageUrl, setImageUrl] = useState();
   const [form] = Form.useForm();
   const [fileName, setFileName] = useState("");
+  const [formTitle, setFormTitle] = useState("Thêm sản phẩm mới");
 
   useEffect(() => {
     setData((data) => data.filter((item) => item.name.includes(searchText)));
@@ -67,14 +70,17 @@ export const Products = ({ seq, setSeq }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axiosClient.get("/api/products");
+        const response = await axiosClient.get(
+          `/api/products?search=${searchText}`
+        );
         setData(response.data);
       } catch (error) {
         console.error(error);
       }
     };
     fetchData();
-  }, [seq]);
+  }, [count, searchText]);
+
   const onSearch = (value, _e) => setSearchText(value);
 
   const handleCancel = () => setIsModalOpen(false);
@@ -116,23 +122,46 @@ export const Products = ({ seq, setSeq }) => {
       title: "Hành động",
       key: "action",
       render: (_, record) => (
-        <Space size="middle" className="flex justify-center">
-          <button>
-            <EditOutlined />
+        <Space size="middle">
+          <button onClick={() => handleEditProduct(record._id)}>
+            <EditOutlined className="text-blue-500" />
           </button>
-          <button onClick={() => handleDeleteProduct(record._id)}>
-            <DeleteOutlined />
-          </button>
+          <Popconfirm
+            title="Bạn có chắc chắn muốn xóa?"
+            onConfirm={() => handleDeleteProduct(record._id)}
+            okText="Có"
+            cancelText="Không"
+          >
+            <button>
+              <DeleteOutlined className="text-red-600" />
+            </button>
+          </Popconfirm>
         </Space>
       ),
     },
   ];
 
+  const handleEditProduct = async (id) => {
+    try {
+      const response = await axiosClient.get(`/api/products/${id}`);
+      const product = response.data;
+      setImageUrl(product.image);
+      form.setFieldsValue(product);
+
+      setFormTitle("Chỉnh sửa sản phẩm");
+      setIsModalOpen(true);
+    } catch (error) {
+      console.log(error);
+
+      message.error("Không tồn tại sản phẩm này.");
+    }
+  };
+
   const handleDeleteProduct = async (id) => {
     try {
       await axiosClient.delete(`/api/products/${id}`);
       message.success("Xóa thành công!");
-      setSeq(seq + 1);
+      setCount((prev) => prev + 1);
     } catch (error) {
       message.error("Xóa thất bại!");
     }
@@ -142,7 +171,7 @@ export const Products = ({ seq, setSeq }) => {
     try {
       await axiosClient.post("/api/products", { ...values });
       message.success("Lưu sản phẩm thành công");
-      setSeq(seq + 1);
+      setCount((prev) => prev + 1);
     } catch (error) {
       console.error(error);
       message.error("Lưu sản phẩm thất bại!");
@@ -211,11 +240,15 @@ export const Products = ({ seq, setSeq }) => {
       <Table columns={columns} dataSource={data} />
 
       <Modal
-        title="Đăng Ký Sản Phẩm Mới"
+        title={formTitle}
         open={isModalOpen}
         onCancel={handleCancel}
         footer={null}
         centered
+        onClose={() => {
+          form.resetFields();
+          setImageUrl("");
+        }}
       >
         <Form
           layout="vertical"
@@ -312,7 +345,7 @@ export const Products = ({ seq, setSeq }) => {
               htmlType="submit"
               className="w-full rounded-lg"
             >
-              Đăng Ký Sản Phẩm
+              Lưu Sản Phẩm
             </Button>
           </Form.Item>
         </Form>

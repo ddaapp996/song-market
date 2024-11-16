@@ -1,28 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
+  LoginOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UploadOutlined,
+  ShoppingCartOutlined,
   UserOutlined,
-  VideoCameraOutlined,
 } from "@ant-design/icons";
 import { Button, Image, Layout, Menu, theme } from "antd";
 import logo from "./logo.svg";
 import { useNavigate } from "react-router-dom";
 import { Products } from "../components/admins/products";
+import { Users } from "../components/admins/users";
 
 const { Header, Sider, Content, Footer } = Layout;
 export const AdminLayout = ({ setContent, children }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const [seq, setSeq] = useState(0);
   const navigate = useNavigate();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-
-  useEffect(() => {
-    setSeq(seq + 1);
-  }, [seq]);
 
   return (
     <Layout>
@@ -42,22 +38,24 @@ export const AdminLayout = ({ setContent, children }) => {
           items={[
             {
               key: "1",
-              icon: <UserOutlined />,
+              icon: <ShoppingCartOutlined />,
               label: "Sản phẩm",
-              onClick: () => {
-                setSeq(seq + 1);
-                setContent(<Products seq={seq} setSeq={setSeq} />);
-              },
+              onClick: () => setContent(<Products />),
             },
             {
               key: "2",
-              icon: <VideoCameraOutlined />,
+              icon: <UserOutlined />,
               label: "Users",
+              onClick: () => setContent(<Users />),
             },
             {
               key: "3",
-              icon: <UploadOutlined />,
-              label: "Others",
+              icon: <LoginOutlined />,
+              label: "Logout",
+              onClick: () => {
+                localStorage.removeItem("authToken");
+                navigate("/login");
+              },
             },
           ]}
         />
