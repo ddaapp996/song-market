@@ -146,4 +146,12 @@ cd song-market
   npm run start
   ```
 
----
+### 6. Hướng dẫn Đăng nhập
+
+- **Trang admin**:
+  - Username: `admin`
+  - Password: `admin@123`
+
+- **Trang user**:
+  - Username: `user1`
+  - Password: `user1234`
