@@ -56,6 +56,7 @@ export const Products = () => {
   const [count, setCount] = useState(0);
   const [searchText, setSearchText] = React.useState("");
   const [data, setData] = useState([]);
+  const [recordId, setRecordId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState();
@@ -141,9 +142,17 @@ export const Products = () => {
     },
   ];
 
+  const handleAddProduct = () => {
+    setRecordId(null);
+    form.resetFields();
+    setImageUrl("");
+    setIsModalOpen(true);
+  };
+
   const handleEditProduct = async (id) => {
     try {
       const response = await axiosClient.get(`/api/products/${id}`);
+      setRecordId(id);
       const product = response.data;
       setImageUrl(product.image);
       form.setFieldsValue(product);
@@ -169,12 +178,16 @@ export const Products = () => {
 
   const handleFormSubmit = async (values) => {
     try {
-      await axiosClient.post("/api/products", { ...values });
-      message.success("Lưu sản phẩm thành công");
+      if (recordId) {
+        await axiosClient.put(`/api/products/${recordId}`, { ...values });
+      } else {
+        await axiosClient.post("/api/products", { ...values });
+      }
+      message.success(recordId ? "Cập nhật sản phẩm thành công" : "Thêm sản phẩm thành công");
       setCount((prev) => prev + 1);
     } catch (error) {
       console.error(error);
-      message.error("Lưu sản phẩm thất bại!");
+      message.error(recordId ? "Cập nhật sản phẩm thất bại!" : "Thêm sản phẩm thất bại");
     }
     setIsModalOpen(false);
   };
@@ -231,7 +244,7 @@ export const Products = () => {
         />
         <Button
           className="bg-blue-600 text-white"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => handleAddProduct()}
         >
           <PlusOutlined />
           Tạo mới
@@ -345,7 +358,7 @@ export const Products = () => {
               htmlType="submit"
               className="w-full rounded-lg"
             >
-              Lưu Sản Phẩm
+              {!recordId ? "Thêm sản phẩm" : "Cập nhật sản phẩm"}
             </Button>
           </Form.Item>
         </Form>
